@@ -2,6 +2,18 @@
 
 `nginx-logresolver` is a Bash script that processes Nginx log files and resolves IP addresses to hostnames. It improves the readability of your logs by replacing IP addresses with their corresponding hostnames. It also caches the results for efficient performance, ensuring that hostnames are looked up only once every 5 hours.
 
+## Why?
+
+By default, Nginx logs contain raw IP addresses instead of hostnames. This is intentional: resolving hostnames requires DNS lookups, which are relatively slow and can significantly degrade performance—especially under high traffic. For that reason, Nginx avoids hostname resolution in logs to keep things fast and efficient.
+
+However, there are many cases where seeing a hostname instead of an IP can be helpful, such as:
+
+- Quickly identifying traffic from known domains or bots
+- Spotting patterns in abuse or suspicious activity
+- Debugging or auditing logs in real-time with more context
+
+This script bridges that gap by resolving IPs to hostnames **outside of Nginx**, after the logs are written. It runs in real time, uses a cache to minimize DNS overhead, and optionally adds colorized output for better readability—all without modifying your Nginx config or affecting its performance.
+
 ## Features
 
 - Resolves IP addresses to hostnames in real-time as Nginx logs are written.
