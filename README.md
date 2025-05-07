@@ -1,6 +1,6 @@
 # nginx-logresolver
 
-`nginx-logresolver` is a Bash script that processes Nginx log files and resolves IP addresses to hostnames. It improves the readability of your logs by replacing IP addresses with their corresponding hostnames. It also caches the results for efficient performance, ensuring that hostnames are looked up only once every 3 hours.
+`nginx-logresolver` is a Bash script that processes Nginx log files and resolves IP addresses to hostnames. It improves the readability of your logs by replacing IP addresses with their corresponding hostnames. It also caches the results for efficient performance, ensuring that hostnames are looked up only once every 5 hours.
 
 ## Features
 
