@@ -17,8 +17,8 @@ This script bridges that gap by resolving IPs to hostnames **outside of Nginx**,
 ## Features
 
 - Resolves IP addresses to hostnames in real-time as Nginx logs are written.
-- Caches hostname lookups for up to 3 hours to reduce the frequency of DNS queries.
-- Supports both error and access logs (`/var/log/nginx/error.log` and `/var/log/nginx/access.log`).
+- Caches hostname lookups for up to 5 hours to reduce the frequency of DNS queries. (stores them to /tmp/ip_cache.txt)
+- Supports both multiple log files.
 - Integrates with `grc` (Generic Colourizer) to add color to the log output for easier reading.
 - Efficient and minimal Bash-based solution with minimal dependencies.
 
