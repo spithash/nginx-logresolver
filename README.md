@@ -26,8 +26,9 @@ This script bridges that gap by resolving IPs to hostnames **outside of Nginx**,
 
 - `bash`
 - `getent` for DNS lookups
-- `grc` (Generic Colourizer) for colorized log output
-- `/var/log/nginx/error.log` and `/var/log/nginx/access.log` for Nginx logs
+- `grc` (Generic Colourizer) for colorized log output (*optional*)
+- `/var/log/nginx/error.log` and `/var/log/nginx/access.log` for Nginx logs (change it to your needs)
+- `tail` linux tail command
 
 ## Installation
 
