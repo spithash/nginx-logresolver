@@ -24,14 +24,14 @@
 ```bash
 git clone https://github.com/spithash/nginx-logresolver.git
 cd nginx-logresolver
-
+```
 ## Usage
 
 Make the script executable:
 
 ```bash
 chmod +x nginx-logresolver.sh
-
+```
 ## Running the Script
 
 Once the script is executable, you can start it with:
