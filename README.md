@@ -28,7 +28,7 @@ This script bridges the gap by resolving IPs **after** logs are written, without
 - `getent` for hostname resolution
 - `grc` (optional, for colored output)
 - `tail`
-- Access to your Nginx logs (default: `/var/log/nginx/infocopy-access.log`, `/var/log/nginx/infocopy-error.log`, and `/var/log/fail2ban.log` — update as needed)
+- Access to your Nginx logs (default: `/var/log/nginx/access.log` — update as needed)
 
 ## Installation
 
@@ -54,7 +54,7 @@ chmod +x nginx-logresolver.sh
 
 ## What It Does
 
-- **Tails logs in real time**: Monitors `/var/log/nginx/infocopy-access.log`, `/var/log/nginx/infocopy-error.log`, and `/var/log/fail2ban.log`.
+- **Tails logs in real time**: Monitors `/var/log/nginx/access.log`.
 - **Resolves IPs to Hostnames**: Converts IP addresses in the log lines to their corresponding hostnames using `getent`.
 - **Caches Results**: Saves hostname lookups in `/tmp/ip_cache.txt` and reuses them for up to 5 hours to reduce DNS lookups.
 - **Adds Color to Logs**: If `-c` is specified and `grc` is installed, log output will be colorized using the `apache` config, making it easier to read.
@@ -63,5 +63,4 @@ chmod +x nginx-logresolver.sh
 
 ```text
 host.example.com - - [07/May/2025:10:42:31 +0000] "GET /index.html HTTP/1.1" 200 1024 "-" "Mozilla/5.0"
-
 
