@@ -40,7 +40,7 @@ load_cache() {
 
 # Save cache back to file
 save_cache() {
-  >"$CACHE_FILE"
+  : >"$CACHE_FILE"
   for ip in "${!ip_cache[@]}"; do
     echo "$ip ${ip_cache[$ip]}" >>"$CACHE_FILE"
   done
