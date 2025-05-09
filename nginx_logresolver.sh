@@ -78,7 +78,7 @@ load_cache
 trap save_cache EXIT
 
 # Tail logs and process
-tail -F /var/log/nginx/infocopy-access.log |
+tail -F /var/log/nginx/access.log |
   while read -r line; do
     ip=$(echo "$line" | awk '{print $1}')
     [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
