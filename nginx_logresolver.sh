@@ -1,9 +1,7 @@
 #!/bin/bash
 
-CACHE_FILE="/tmp/ip_cache.txt"
-declare -A ip_cache
-CACHE_TIMEOUT=18000 # 5 hours
 USE_GRC=false
+ASSUME_YES=false
 
 # Handle command-line options
 while [[ $# -gt 0 ]]; do
@@ -12,70 +10,52 @@ while [[ $# -gt 0 ]]; do
     USE_GRC=true
     shift
     ;;
+  -y | --yes)
+    ASSUME_YES=true
+    shift
+    ;;
   *)
-    echo "Usage: $0 [-c|--color]"
+    echo "Usage: $0 [-c|--color] [-y|--yes]"
     exit 1
     ;;
   esac
 done
 
-# Load cache into associative array
-load_cache() {
-  local current_time
-  current_time=$(date +%s)
-
-  if [[ -f "$CACHE_FILE" ]]; then
-    while read -r line; do
-      local ip host timestamp
-      ip=$(echo "$line" | cut -d' ' -f1)
-      host=$(echo "$line" | cut -d' ' -f2)
-      timestamp=$(echo "$line" | cut -d' ' -f3)
-
-      if ((current_time - timestamp < CACHE_TIMEOUT)); then
-        ip_cache["$ip"]="$host $timestamp"
-      fi
-    done <"$CACHE_FILE"
-  fi
-}
-
-# Save cache back to file
-save_cache() {
-  : >"$CACHE_FILE"
-  for ip in "${!ip_cache[@]}"; do
-    echo "$ip ${ip_cache[$ip]}" >>"$CACHE_FILE"
+# Check if dnsmasq binary exists in common locations
+find_dnsmasq() {
+  for path in /usr/sbin/dnsmasq /sbin/dnsmasq /usr/bin/dnsmasq /bin/dnsmasq; do
+    if [[ -x "$path" ]]; then
+      return 0
+    fi
   done
+  return 1
 }
 
-# Get host for IP, using cache or DNS
+# Warn user if dnsmasq is not found
+if ! find_dnsmasq; then
+  echo "Warning: 'dnsmasq' is not installed or not found in common locations."
+  echo "This script performs better with dnsmasq installed because it caches DNS queries and avoids repeated lookups."
+
+  if ! $ASSUME_YES; then
+    read -rp "Do you want to continue anyway? [y/N]: " answer
+    case "$answer" in
+    [Yy]*) ;;
+    *)
+      echo "Exiting."
+      exit 1
+      ;;
+    esac
+  fi
+fi
+
+# Get host for IP using DNS
 get_host() {
   local ip=$1
-  local current_time
-  current_time=$(date +%s)
-
-  if [[ -n "${ip_cache[$ip]}" ]]; then
-    local cached_host cached_time
-    cached_host=$(echo "${ip_cache[$ip]}" | cut -d' ' -f1)
-    cached_time=$(echo "${ip_cache[$ip]}" | cut -d' ' -f2)
-
-    if ((current_time - cached_time < CACHE_TIMEOUT)); then
-      echo "$cached_host"
-      return
-    fi
-  fi
-
   local resolved_host
+
   resolved_host=$(getent hosts "$ip" | awk '{print $2}')
-  resolved_host=${resolved_host:-$ip}
-
-  ip_cache["$ip"]="$resolved_host $current_time"
-  echo "$resolved_host"
+  echo "${resolved_host:-$ip}"
 }
-
-# Load initial cache
-load_cache
-
-# Save updated cache on exit
-trap save_cache EXIT
 
 # Tail logs and process
 tail -F /var/log/nginx/access.log |
