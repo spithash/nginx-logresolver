@@ -1,6 +1,6 @@
 # Nginx Log DNS Resolver
 
-`nginx-logresolver` is a Bash script that processes Nginx log files and resolves IP addresses to hostnames. It improves the readability of your logs by replacing IP addresses with their corresponding hostnames. The script uses a cache to avoid repeated DNS lookups, ensuring efficient performance, and supports optional colorized output for better readability.
+`nginx-logresolver` is a Bash script that processes Nginx access logs and resolves IP addresses to hostnames in real time. It improves the readability of logs by replacing IPs with their corresponding hostnames using system DNS resolution. The script optionally colorizes the output and checks if `dnsmasq` is installed to improve performance via local DNS caching.
 
 ## Why?
 
@@ -8,27 +8,27 @@ By default, Nginx logs contain raw IP addresses instead of hostnames. This is in
 
 However, hostnames can be helpful for:
 
-- Identifying traffic from known domains or bots
-- Spotting patterns in abuse or suspicious activity
-- Debugging or auditing logs in real time with more context
+- Identify traffic from known domains or bots
+- Spot patterns in abuse or suspicious activity
+- Debug or audit logs with more context
 
-This script bridges the gap by resolving IPs **after** logs are written, without modifying Nginx's configuration or performance. It works in real time, uses a smart caching mechanism, and optionally outputs colorized logs.
+This script reads logs after they are written, performing DNS resolution on-the-fly without changing Nginx’s configuration or degrading its performance.
 
 ## Features
 
 - Resolves IP addresses to hostnames in real time as logs are written.
-- Caches hostname lookups for 5 hours to reduce repeated DNS queries.
-- Processes multiple log files simultaneously.
-- Supports `grc` (Generic Colourizer) for optional color output via a `-c` flag.
-- Lightweight and dependency-minimal Bash script.
+- Checks if `dnsmasq` is installed and suggests using it for faster local DNS caching.
+- Optional colored output via the `-c` / `--color` flag (requires `grc`).
+- Skips confirmation prompts using the `-y` / `--yes` flag.
+- Lightweight and minimal — pure Bash with no caching layer.
 
 ## Requirements
 
 - `bash`
-- `getent` for hostname resolution
+- `getent` for DNS resolution
 - `grc` (optional, for colored output)
 - `tail`
-- Access to your Nginx logs (default: `/var/log/nginx/access.log` — update as needed)
+- Access to your Nginx logs (default: `/var/log/nginx/access.log` — can be customized)
 
 ## Installation
 
@@ -46,18 +46,24 @@ chmod +x nginx-logresolver.sh
 ./nginx-logresolver.sh
 ```
 
-## With colorized output (requires grc):
+### With colorized output (requires grc):
 ```bash
 
 ./nginx-logresolver.sh -c
 ```
 
+### Skip dnsmasq warning:
+```bash
+
+./nginx-logresolver.sh -y
+```
+
 ## What It Does
 
-- **Tails logs in real time**: Monitors `/var/log/nginx/access.log`.
-- **Resolves IPs to Hostnames**: Converts IP addresses in the log lines to their corresponding hostnames using `getent`.
-- **Caches Results**: Saves hostname lookups in `/tmp/ip_cache.txt` and reuses them for up to 5 hours to reduce DNS lookups.
-- **Adds Color to Logs**: If `-c` is specified and `grc` is installed, log output will be colorized using the `apache` config, making it easier to read.
+- **Tails logs in real time**: Watches `/var/log/nginx/access.log` and processes new entries as they appear.
+- **Resolves IPs to hostnames**: Uses `getent hosts` to replace the IP address in each log line with its corresponding hostname.
+- **Suggests dnsmasq**: If `dnsmasq` is not found in common system paths, warns the user that enabling it will improve performance by caching DNS queries.
+- **Adds color**: If `-c` is specified and `grc` is installed, applies syntax highlighting to logs using `grc`.
 
 ## Example Output
 
