@@ -2,6 +2,18 @@
 
 USE_GRC=false
 ASSUME_YES=false
+SHOW_IP=false
+
+# Display help message
+show_help() {
+  echo "Usage: $0 [OPTIONS]"
+  echo ""
+  echo "OPTIONS:"
+  echo "  -c, --color      Use colorized output with grc"
+  echo "  -y, --yes        Automatically assume 'yes' to prompts"
+  echo "  -i, --show-ip    Show the client's IP address at the end of each log line"
+  echo "  -h, --help       Show this help message"
+}
 
 # Handle command-line options
 while [[ $# -gt 0 ]]; do
@@ -14,8 +26,17 @@ while [[ $# -gt 0 ]]; do
     ASSUME_YES=true
     shift
     ;;
+  -i | --show-ip)
+    SHOW_IP=true
+    shift
+    ;;
+  -h | --help)
+    show_help
+    exit 0
+    ;;
   *)
-    echo "Usage: $0 [-c|--color] [-y|--yes]"
+    echo "Invalid option: $1"
+    show_help
     exit 1
     ;;
   esac
@@ -57,19 +78,28 @@ get_host() {
   echo "${resolved_host:-$ip}"
 }
 
+# Regular expression to match both IPv4 and IPv6 addresses
+is_ip_address() {
+  local ip=$1
+  # Matches IPv4 or IPv6 (basic check)
+  [[ $ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ || $ip =~ ^([0-9a-fA-F:]+:+)+[0-9a-fA-F]+$ ]]
+}
+
 # Tail logs and process
 tail -F /var/log/nginx/access.log |
   while read -r line; do
     ip=$(echo "$line" | awk '{print $1}')
-    [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+    if is_ip_address "$ip"; then
+      host=$(get_host "$ip")
+      if $SHOW_IP; then
+        formatted_line=$(echo "$line" | awk -v host="$host" -v ip="$ip" '{$1=host; print $0 " (" ip ")"}')
+      else
+        formatted_line=$(echo "$line" | awk -v host="$host" '{$1=host; print $0}')
+      fi
+      echo "$formatted_line"
+    else
       echo "$line"
-      continue
-    }
-
-    host=$(get_host "$ip")
-    formatted_line=$(echo "$line" | awk -v host="$host" '{$1=host; print}')
-
-    echo "$formatted_line"
+    fi
   done |
   {
     if $USE_GRC; then
