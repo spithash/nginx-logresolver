@@ -10,8 +10,8 @@ show_help() {
   echo ""
   echo "OPTIONS:"
   echo "  -c, --color      Use colorized output with grc"
-  echo "  -y, --yes        Automatically assume 'yes' to prompts"
-  echo "  -i, --show-ip    Show the client's IP address at the end of each log line"
+  echo "  -y, --yes        Assume 'yes' to prompts"
+  echo "  -i, --show-ip    Show the IP address after the resolved domain"
   echo "  -h, --help       Show this help message"
 }
 
@@ -92,7 +92,8 @@ tail -F /var/log/nginx/access.log |
     if is_ip_address "$ip"; then
       host=$(get_host "$ip")
       if $SHOW_IP; then
-        formatted_line=$(echo "$line" | awk -v host="$host" -v ip="$ip" '{$1=host; print $0 " (" ip ")"}')
+        # Remove any spaces before or after the domain and IP, and ensure proper formatting
+        formatted_line=$(echo "$line" | awk -v host="$host" -v ip="$ip" '{$1=host " - (" ip ")"; $2=""; print $0}' | sed 's/ - - / /')
       else
         formatted_line=$(echo "$line" | awk -v host="$host" '{$1=host; print $0}')
       fi
