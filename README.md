@@ -28,6 +28,7 @@ This script reads logs after they are written, performing DNS resolution on-the-
 - `getent` for DNS resolution
 - `grc` (optional, for colored output)
 - `tail`
+- `dnsmasq` (Not required in the script. It's optional but adds dns caching. you can use any other dns forwarder/resolver that enables query caching as well)
 - Access to your Nginx logs (default: `/var/log/nginx/access.log` — can be customized)
 
 ## Installation
