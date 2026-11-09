@@ -36,7 +36,7 @@ This script reads logs after they are written, performing DNS resolution on-the-
 ```bash
 git clone https://github.com/spithash/nginx-logresolver.git
 cd nginx-logresolver
-chmod +x nginx-logresolver.sh
+chmod +x nginx_logresolver.sh
 ```
 
 ## Usage
