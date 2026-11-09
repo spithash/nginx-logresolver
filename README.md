@@ -1,6 +1,6 @@
 # Nginx Log DNS Resolver
 
-`nginx-logresolver` is a Bash script that processes Nginx access logs and resolves IP addresses to hostnames in real time. It improves the readability of logs by replacing IPs with their corresponding hostnames using system DNS resolution. The script optionally colorizes the output and checks if `dnsmasq` is installed to improve performance via local DNS caching.
+`nginx_logresolver` is a Bash script that processes Nginx access logs and resolves IP addresses to hostnames in real time. It improves the readability of logs by replacing IPs with their corresponding hostnames using system DNS resolution. The script optionally colorizes the output and checks if `dnsmasq` is installed to improve performance via local DNS caching.
 
 ## Why?
 
@@ -44,19 +44,19 @@ chmod +x nginx_logresolver.sh
 ### Basic usage:
 
 ```bash
-./nginx-logresolver.sh
+./nginx_logresolver.sh
 ```
 
 ### With colorized output (requires grc):
 ```bash
 
-./nginx-logresolver.sh -c
+./nginx_logresolver.sh -c
 ```
 
 ### Skip dnsmasq warning:
 ```bash
 
-./nginx-logresolver.sh -y
+./nginx_logresolver.sh -y
 ```
 
 ## What It Does
